@@ -1,39 +1,3 @@
-/*package main
-
-import (
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-)
-
-func main() {
-	//var mydata string[];
-	// запрос в формате http
-	//response, request := http.Get("http://localhost:8000/_/api/")
-	response, request := http.Get("http://localhost:8000/_/api/v3/key_values")
-
-	if request != nil {
-		log.Fatal("failed to read file:",request) //Fatal is equivalent to Print() followed by a call to os.Exit(1)
-	}
-	defer response.Body.Close()  //закрываем файл defer до выхода из функции мейн
-
-
-
-	// копируем инфо в нормальный вывод
-
-	if request != nil {
-		n, request := io.Copy(os.Stdout, response.Body)
-		log.Fatal("failed to copy file",request)
-	}
-
-	fmt.Println("number of bytes:",n)
-}
-*/
-
-
-
 package main
 import (
 	"encoding/json"
@@ -84,63 +48,34 @@ func main() {
 
 
 	for  ; length!=0 ;  {
-		    if counter!=0 {
-				fmt.Println("Data=", Datan.Info[0])
-			}
-			response, err := http.Get(MyLink)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer response.Body.Close()
+	    if counter!=0 {
+	        fmt.Println("Data=", Datan.Info[0])
+	    }
+	    response, err := http.Get(MyLink)
+	    if err != nil {
+	        log.Fatal(err)
+	    }
+	    defer response.Body.Close()
+            
+	    dataInBytes, err := ioutil.ReadAll(response.Body)
+	    if err != nil {
+	        fmt.Printf("failed to read json file, error: %v", err)
+		return
+	    }
 
-
-
-			dataInBytes, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				fmt.Printf("failed to read json file, error: %v", err)
-				return
-			}
-
-			error:= json.Unmarshal([]byte(dataInBytes), &Datan)
-			if error != nil {
-				fmt.Println(error)
-				return
-			}
+	    error:= json.Unmarshal([]byte(dataInBytes), &Datan)
+	    if error != nil {
+	        fmt.Println(error)
+		return
+	    }
             counter++
-			fmt.Println("Self of page ",counter,"=",Datan.Links.Self)
-			fmt.Println("Next of page ",(counter+1),"=",Datan.Links.Next)
+	    fmt.Println("Self of page ",counter,"=",Datan.Links.Self)
+	    fmt.Println("Next of page ",(counter+1),"=",Datan.Links.Next)
 
-			length=len(Datan.Info)
-			MyLink="http://localhost:8000/_/api"+Datan.Links.Next
+	    length=len(Datan.Info)
+	    MyLink="http://localhost:8000/_/api"+Datan.Links.Next
 	}
 
 
 
 }
-/*
-package main
-
-import (
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-)
-
-func main() {
-	// запрос в формате http
-	response, request := http.Get("http://localhost:8000/_/api/v3/key_values")
-	if request != nil {
-		log.Fatal("failed to read file:",request) //Fatal is equivalent to Print() followed by a call to os.Exit(1)
-	}
-	defer response.Body.Close()  //закрываем файл defer до выхода из функции мейн
-
-	// копируем инфо в нормальный вывод
-	n, request := io.Copy(os.Stdout, response.Body)
-	if request != nil {
-		log.Fatal("failed to copy file",request)
-	}
-
-	fmt.Println("number of bytes:", n)
-} */
